@@ -1,3 +1,4 @@
+/* ===== Base Reset ===== */
 body, html {
   margin: 0;
   padding: 0;
@@ -7,6 +8,39 @@ body, html {
   background: black;
 }
 
+/* ===== Canvases Layered ===== */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Shader behind everything */
+#shader-canvas {
+  z-index: -2;
+}
+
+/* Starfield (if present) would go here if needed */
+#warp-bg {
+  z-index: -1;
+}
+
+/* Orbs above background layers */
+#orb-canvas {
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+
+/* Visualizer on top of orbs */
+#audio-visualizer {
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+
+/* ===== UI Elements ===== */
 #title {
   position: absolute;
   top: 5%;
@@ -36,16 +70,20 @@ body, html {
   animation: pulse 2s infinite;
   transition: transform 0.2s ease;
 }
+
 .orbital-links a:hover {
   transform: scale(1.2);
   color: #ff00ff;
   text-shadow: 0 0 15px #f0f;
 }
 
+/* ===== Pulse Animation ===== */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ===== BTC Widget ===== */
 #btc-widget {
   position: absolute;
   bottom: 20px;
@@ -57,16 +95,8 @@ body, html {
   overflow: hidden;
   box-shadow: 0 0 10px #00ffcc;
 }
-#audio-visualizer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
+
+/* ===== Mute Button ===== */
 #mute-toggle {
   position: fixed;
   top: 10px;
@@ -82,6 +112,7 @@ body, html {
   font-family: 'Orbitron', sans-serif;
   transition: 0.2s;
 }
+
 #mute-toggle:hover {
   background: rgba(0, 255, 255, 0.2);
   color: #fff;
