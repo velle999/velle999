@@ -1,8 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // ===== Audio Setup =====
+  // ===== Audio Setup + Rotating Playlist =====
   const bgMusic = document.getElementById('bg-music');
   const hoverSound = document.getElementById('hover-sound');
   const muteBtn = document.getElementById('mute-toggle');
+
+  const playlist = [
+    'assets/ambientspace.mp3',
+    'assets/ambient.mp3'
+  ];
+  let currentTrack = 0;
+
+  function playCurrentTrack() {
+    bgMusic.src = playlist[currentTrack];
+    bgMusic.load();
+    bgMusic.play().catch(err => console.warn('Track play failed:', err));
+  }
+
+bgMusic.addEventListener('ended', () => {
+  let nextTrack;
+  do {
+    nextTrack = Math.floor(Math.random() * playlist.length);
+  } while (nextTrack === currentTrack && playlist.length > 1);
+
+  currentTrack = nextTrack;
+  playCurrentTrack();
+});
 
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const analyser = audioCtx.createAnalyser();
@@ -17,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let unlocked = false;
   window.addEventListener('click', () => {
     if (!unlocked) {
-      bgMusic.play().catch(err => console.warn('Music play failed:', err));
+      playCurrentTrack();
       audioCtx.resume().catch(err => console.warn('Audio context resume failed:', err));
       unlocked = true;
     }
