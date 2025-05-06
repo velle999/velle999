@@ -89,30 +89,113 @@ document.addEventListener('DOMContentLoaded', () => {
   resizeVisualizer();
   bgMusic.addEventListener('play', drawVisualizer);
 
+  // ===== Shader Canvas Fix =====
+  const shaderCanvas = document.getElementById('shader-canvas');
+  const gl = shaderCanvas.getContext('webgl', { alpha: true });
+  if (!gl) return console.warn('WebGL not supported');
+
+  shaderCanvas.width = window.innerWidth;
+  shaderCanvas.height = window.innerHeight;
+  gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  const vertex = `
+    attribute vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+    }
+  `;
+
+  const fragment = `
+    precision highp float;
+    uniform float time;
+    uniform vec2 resolution;
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / resolution.xy;
+      vec2 p = uv - 0.5;
+      p.x *= resolution.x / resolution.y;
+
+      float color = 0.0;
+      float t = time * 0.1;
+
+      for (float i = 1.0; i < 5.0; i++) {
+        p = vec2(
+          cos(t - p.x) + sin(p.y),
+          sin(t + p.y) + cos(p.x)
+        );
+        color += 1.0 / length(p);
+      }
+
+      color = smoothstep(0.0, 1.0, color);
+      gl_FragColor = vec4(vec3(color, color * 0.3, sin(time * 0.1)), 0.35);
+    }
+  `;
+
+  function compileShader(src, type) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, src);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(shader));
+    }
+    return shader;
+  }
+
+  const program = gl.createProgram();
+  gl.attachShader(program, compileShader(vertex, gl.VERTEX_SHADER));
+  gl.attachShader(program, compileShader(fragment, gl.FRAGMENT_SHADER));
+  gl.linkProgram(program);
+  gl.useProgram(program);
+
+  const pos = gl.getAttribLocation(program, 'position');
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1, -1, 1, -1, -1, 1,
+    -1, 1, 1, -1, 1, 1
+  ]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+  const tUni = gl.getUniformLocation(program, 'time');
+  const resUni = gl.getUniformLocation(program, 'resolution');
+
+  function renderShader(t) {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
+    gl.uniform1f(tUni, t * 0.001);
+    gl.uniform2f(resUni, shaderCanvas.width, shaderCanvas.height);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(renderShader);
+  }
+  renderShader(0);
+
   // ===== Starfield Background =====
   const canvas = document.getElementById('warp-bg');
   const ctx = canvas.getContext('2d');
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   let stars = Array.from({ length: 200 }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    z: Math.random() * w
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    z: Math.random() * canvas.width
   }));
 
   function animateStarfield() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#0ff";
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0ff';
 
     for (let star of stars) {
       star.z -= 2;
-      if (star.z <= 0) star.z = w;
+      if (star.z <= 0) star.z = canvas.width;
       const k = 128.0 / star.z;
-      const x = (star.x - w / 2) * k + w / 2;
-      const y = (star.y - h / 2) * k + h / 2;
-      const size = (1 - star.z / w) * 3;
+      const x = (star.x - canvas.width / 2) * k + canvas.width / 2;
+      const y = (star.y - canvas.height / 2) * k + canvas.height / 2;
+      const size = (1 - star.z / canvas.width) * 3;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
       ctx.fill();
@@ -120,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     requestAnimationFrame(animateStarfield);
   }
-
   animateStarfield();
 
   // ===== Audio-Reactive RGB Floating Orbs =====
@@ -166,99 +248,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     requestAnimationFrame(animateOrbs);
   }
-
   animateOrbs();
-
-  // ===== GLSL Fractal Shader =====
-  const shaderCanvas = document.getElementById('shader-canvas');
-  const gl = shaderCanvas.getContext('webgl');
-  shaderCanvas.width = window.innerWidth;
-  shaderCanvas.height = window.innerHeight;
-  gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
-
-  const vertex = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
-    }
-  `;
-
-  const fragment = `
-    precision highp float;
-    uniform float time;
-    uniform vec2 resolution;
-
-    void main() {
-      vec2 uv = gl_FragCoord.xy / resolution.xy;
-      vec2 p = uv - 0.5;
-      p.x *= resolution.x / resolution.y;
-
-      float color = 0.0;
-      float t = time * 0.1;
-
-      for (float i = 1.0; i < 5.0; i++) {
-        p = vec2(
-          cos(t - p.x) + sin(p.y),
-          sin(t + p.y) + cos(p.x)
-        );
-        color += 1.0 / length(p);
-      }
-
-      color = smoothstep(0.0, 1.0, color);
-      gl_FragColor = vec4(vec3(color, color * 0.3, sin(time * 0.1)), 1.0);
-    }
-  `;
-
-  function compileShader(source, type) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      throw new Error('Shader compile failed: ' + gl.getShaderInfoLog(shader));
-    }
-    return shader;
-  }
-
-  const program = gl.createProgram();
-  gl.attachShader(program, compileShader(vertex, gl.VERTEX_SHADER));
-  gl.attachShader(program, compileShader(fragment, gl.FRAGMENT_SHADER));
-  gl.linkProgram(program);
-  gl.useProgram(program);
-
-  const position = gl.getAttribLocation(program, "position");
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1, 1, -1, -1, 1,
-    -1, 1, 1, -1, 1, 1
-  ]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(position);
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-
-  const timeUniform = gl.getUniformLocation(program, "time");
-  const resolutionUniform = gl.getUniformLocation(program, "resolution");
-
-  function renderShader(t) {
-    gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
-    gl.uniform1f(timeUniform, t * 0.001);
-    gl.uniform2f(resolutionUniform, shaderCanvas.width, shaderCanvas.height);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    requestAnimationFrame(renderShader);
-  }
-
-  renderShader(0);
 
   // ===== Responsive Resizing =====
   window.addEventListener('resize', () => {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     orbCanvas.width = window.innerWidth;
     orbCanvas.height = window.innerHeight;
-
     visualizerCanvas.width = window.innerWidth;
     visualizerCanvas.height = window.innerHeight;
-
     shaderCanvas.width = window.innerWidth;
     shaderCanvas.height = window.innerHeight;
     gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height);
