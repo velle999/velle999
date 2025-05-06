@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   animateStarfield();
 
-  // ===== RGB Floating Orbs (smaller) =====
+  // ===== Audio-Reactive RGB Floating Orbs =====
   const orbCanvas = document.getElementById('orb-canvas');
   const octx = orbCanvas.getContext('2d');
   orbCanvas.width = window.innerWidth;
@@ -132,42 +132,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const orbs = Array.from({ length: 25 }, () => ({
     x: Math.random() * orbCanvas.width,
     y: Math.random() * orbCanvas.height,
-    radius: 8 + Math.random() * 12,
+    radius: 6 + Math.random() * 6,
     dx: (Math.random() - 0.5) * 0.5,
     dy: (Math.random() - 0.5) * 0.5,
     hue: Math.random() * 360
   }));
 
-function animateOrbs() {
-  octx.clearRect(0, 0, orbCanvas.width, orbCanvas.height);
-  analyser.getByteFrequencyData(dataArray); // <-- grab fresh audio data
+  function animateOrbs() {
+    octx.clearRect(0, 0, orbCanvas.width, orbCanvas.height);
+    analyser.getByteFrequencyData(dataArray);
 
-  for (let i = 0; i < orbs.length; i++) {
-    const orb = orbs[i];
-    orb.x += orb.dx;
-    orb.y += orb.dy;
-    orb.hue += 0.5;
+    for (let i = 0; i < orbs.length; i++) {
+      const orb = orbs[i];
+      orb.x += orb.dx;
+      orb.y += orb.dy;
+      orb.hue += 0.5;
 
-    if (orb.x < -orb.radius) orb.x = orbCanvas.width + orb.radius;
-    if (orb.x > orbCanvas.width + orb.radius) orb.x = -orb.radius;
-    if (orb.y < -orb.radius) orb.y = orbCanvas.height + orb.radius;
-    if (orb.y > orbCanvas.height + orb.radius) orb.y = -orb.radius;
+      if (orb.x < -orb.radius) orb.x = orbCanvas.width + orb.radius;
+      if (orb.x > orbCanvas.width + orb.radius) orb.x = -orb.radius;
+      if (orb.y < -orb.radius) orb.y = orbCanvas.height + orb.radius;
+      if (orb.y > orbCanvas.height + orb.radius) orb.y = -orb.radius;
 
-    const volume = dataArray[i % dataArray.length] / 255;
-    const dynamicRadius = orb.radius * (0.75 + volume * 1.5);
+      const volume = dataArray[i % dataArray.length] / 255;
+      const dynamicRadius = orb.radius * (0.75 + volume * 1.5);
 
-    octx.beginPath();
-    octx.arc(orb.x, orb.y, dynamicRadius, 0, Math.PI * 2);
-    octx.fillStyle = `hsla(${orb.hue}, 100%, 60%, ${0.05 + volume * 0.3})`;
-    octx.shadowColor = `hsla(${orb.hue}, 100%, 60%, ${0.2 + volume * 0.4})`;
-    octx.shadowBlur = 25 + volume * 50;
-    octx.fill();
+      octx.beginPath();
+      octx.arc(orb.x, orb.y, dynamicRadius, 0, Math.PI * 2);
+      octx.fillStyle = `hsla(${orb.hue}, 100%, 60%, ${0.05 + volume * 0.3})`;
+      octx.shadowColor = `hsla(${orb.hue}, 100%, 60%, ${0.2 + volume * 0.4})`;
+      octx.shadowBlur = 25 + volume * 50;
+      octx.fill();
+    }
+
+    requestAnimationFrame(animateOrbs);
   }
 
-  requestAnimationFrame(animateOrbs);
-}
+  animateOrbs();
 
-  // ===== GLSL Fractal Shader (unchanged) =====
+  // ===== GLSL Fractal Shader =====
   const shaderCanvas = document.getElementById('shader-canvas');
   const gl = shaderCanvas.getContext('webgl');
   shaderCanvas.width = window.innerWidth;

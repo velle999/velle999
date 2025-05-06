@@ -20,23 +20,23 @@ canvas {
 
 /* Shader behind everything */
 #shader-canvas {
-  z-index: -2;
+  z-index: -3;
 }
 
 /* Starfield (if present) would go here if needed */
 #warp-bg {
-  z-index: -1;
+  z-index: -2;
 }
 
 /* Orbs above background layers */
 #orb-canvas {
-  z-index: 0;
+  z-index: -1;
   mix-blend-mode: screen;
 }
 
 /* Visualizer on top of orbs */
 #audio-visualizer {
-  z-index: 1;
+  z-index: 0;
   mix-blend-mode: screen;
 }
 
