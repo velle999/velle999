@@ -139,7 +139,7 @@ bgMusic.addEventListener('ended', () => {
     orbs.push({
       x: Math.random() * orbCanvas.width,
       y: Math.random() * orbCanvas.height,
-      radius: 30 + Math.random() * 50,
+      radius: 8 + Math.random() * 12,
       dx: (Math.random() - 0.5) * 0.5,
       dy: (Math.random() - 0.5) * 0.5,
       hue: Math.random() * 360
