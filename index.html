@@ -3,44 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VELLEVERSE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <title>🌌 VELLEVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="cursor: url('data:image/png;base64,...'), auto;">
+<body>
 
   <!-- Background Canvases -->
-  <canvas id="shader-canvas"></canvas>       <!-- Deepest -->
-  <canvas id="warp-bg"></canvas>             <!-- Starfield -->
-  <canvas id="orb-canvas"></canvas>          <!-- RGB Orbs -->
-  <canvas id="audio-visualizer"></canvas>    <!-- Music bars -->
+  <canvas id="shader-canvas"></canvas>
+  <canvas id="warp-bg"></canvas>
+  <canvas id="orb-canvas"></canvas>
+  <canvas id="audio-visualizer"></canvas>
+  <canvas id="particle-canvas"></canvas>
 
-  <!-- Title -->
-  <div id="title">🌌 VELLEVERSE</div>
+  <!-- Vignette Overlay -->
+  <div class="vignette"></div>
 
-  <!-- Project Links -->
-  <div class="orbital-links">
-    <!-- Games -->
-    <a href="https://velle999.github.io/Zombie-Domo/" target="_blank">🧟 Zombie Domo</a>
-    <a href="https://velle999.github.io/touch-grass/" target="_blank">🌱 Touch Grass</a>
-    <a href="https://velle999.github.io/run/" target="_blank">🏃 RUN</a>
+  <!-- Header -->
+  <header>
+    <div id="title">
+      <span class="title-glow">VELLEVERSE</span>
+      <div class="title-subtitle">◈ ENTER THE DIGITAL COSMOS ◈</div>
+    </div>
+  </header>
 
-    <!-- Experiments / Apps -->
-    <a href="https://velle999.github.io/Pixel-Trail/" target="_blank">🐮 Pixel Trail</a>
-    <a href="https://velle999.github.io/Rad-Roller/" target="_blank">🚗 Rad Roller</a>
-    <a href="https://velle999.github.io/AetherPulse/" target="_blank">🌩️ AetherPulse</a>
-    <a href="https://velle999.github.io/Pi-Desktop-Clock/" target="_blank">⏰ Pi Desktop Clock</a>
+  <!-- Main Navigation -->
+  <nav class="orbital-links">
+    <div class="links-container">
+      <!-- Games Section -->
+      <div class="link-group">
+        <div class="group-label">GAMES</div>
+        <a href="https://velle999.github.io/Zombie-Domo/" target="_blank" data-icon="🧟">
+          <span class="link-text">Zombie Domo</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://velle999.github.io/touch-grass/" target="_blank" data-icon="🌱">
+          <span class="link-text">Touch Grass</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://velle999.github.io/run/" target="_blank" data-icon="🏃">
+          <span class="link-text">RUN</span>
+          <span class="link-arrow">→</span>
+        </a>
+      </div>
 
-    <!-- Dashboards / Tools -->
-    <a href="https://velle999.github.io/BTC-Weather-Radar/" target="_blank">₿ BTC Clock</a>
+      <!-- Experiments Section -->
+      <div class="link-group">
+        <div class="group-label">EXPERIMENTS</div>
+        <a href="https://velle999.github.io/Pixel-Trail/" target="_blank" data-icon="🎮">
+          <span class="link-text">Pixel Trail</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://velle999.github.io/Rad-Roller/" target="_blank" data-icon="🚗">
+          <span class="link-text">Rad Roller</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://velle999.github.io/AetherPulse/" target="_blank" data-icon="🌩️">
+          <span class="link-text">AetherPulse</span>
+          <span class="link-arrow">→</span>
+        </a>
+        <a href="https://velle999.github.io/Pi-Desktop-Clock/" target="_blank" data-icon="⏰">
+          <span class="link-text">Pi Desktop Clock</span>
+          <span class="link-arrow">→</span>
+        </a>
+      </div>
 
-    <!-- Support -->
-    <a href="https://buymeacoffee.com/velle999/" target="_blank">☕ Buy Me A Coffee</a>
+      <!-- Tools Section -->
+      <div class="link-group">
+        <div class="group-label">TOOLS</div>
+        <a href="https://velle999.github.io/BTC-Weather-Radar/" target="_blank" data-icon="₿">
+          <span class="link-text">BTC Clock</span>
+          <span class="link-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Support Section -->
+      <div class="link-group">
+        <a href="https://buymeacoffee.com/velle999/" target="_blank" class="support-link" data-icon="☕">
+          <span class="link-text">Support My Work</span>
+          <span class="link-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="mute-toggle" title="Toggle Sound">
+      <span class="icon">🔊</span>
+    </button>
   </div>
-
-  <!-- Mute/Unmute Button -->
-  <button id="mute-toggle" title="Toggle Sound">🔊</button>
 
   <!-- Audio Elements -->
   <audio id="bg-music" loop></audio>
