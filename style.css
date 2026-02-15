@@ -15,10 +15,11 @@
   box-sizing: border-box;
 }
 
-body, html {
+html, body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-y: auto;   /* allow vertical scroll */
+  overflow-x: hidden; /* keep horizontal locked */
   font-family: 'Orbitron', sans-serif;
   color: var(--primary);
   background: var(--bg-dark);
@@ -82,7 +83,7 @@ canvas {
 
 /* ===== Header & Title ===== */
 header {
-  position: absolute;
+  position: fixed;
   top: 0;
   width: 100%;
   z-index: 10;
@@ -150,13 +151,11 @@ header {
 
 /* ===== Navigation Links ===== */
 .orbital-links {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+  position: relative;
+  margin: 180px auto 120px auto; /* push below header for scrolling */
   width: 90%;
   max-width: 800px;
+  z-index: 10;
 }
 
 .links-container {
@@ -164,6 +163,7 @@ header {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
   padding: 2rem;
+  min-height: 120vh; /* ensures scroll space */
 }
 
 .link-group {
